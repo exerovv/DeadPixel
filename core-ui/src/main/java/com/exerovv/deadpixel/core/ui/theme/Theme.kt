@@ -6,22 +6,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple,
+    primary = Orange,
     onPrimary = White,
-    primaryContainer = PurpleContainer,
-    onPrimaryContainer = Color(0xFFBEA9FF),
-    secondary = Orange,
-    onSecondary = Color(0xFF1C0C00),
-    secondaryContainer = OrangeContainer,
-    onSecondaryContainer = Color(0xFFFFB74D),
+    secondary = Purple,
+    onSecondary = White,
     background = Grey500,
     onBackground = White,
     surface = Grey300,
-    onSurface = White,
+    onSurface = Grey100,
     onSurfaceVariant = Grey100,
-    outline = Color(0xFF605C6B),
     error = ErrorRed,
-    onError = Color(0xFF1C0009)
+    onError = White
 )
 
 @Composable
