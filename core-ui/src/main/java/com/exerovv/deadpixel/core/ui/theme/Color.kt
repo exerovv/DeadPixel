@@ -2,14 +2,12 @@ package com.exerovv.deadpixel.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val White = Color(0xFFE6E1E5)
+val White = Color(0xFFF4F4F4)
 val Purple = Color(0xFF7F52FF)
-val Orange = Color(0xFFF58300)
+val Orange = Color(0xFFF88909)
 
-val Grey100 = Color(0xFFCAC4D0)
-val Grey300 = Color(0xFF27262B)
-val Grey500 = Color(0xFF1C1B1F)
+val Grey100 = Color(0xFFC0C0C2)
+val Grey300 = Color(0xFF303033)
+val Grey500 = Color(0xFF19191C)
 
-val PurpleContainer = Color(0xFF3A1FA3)
-val OrangeContainer = Color(0xFF7A4000)
 val ErrorRed = Color(0xFFCF6679)
