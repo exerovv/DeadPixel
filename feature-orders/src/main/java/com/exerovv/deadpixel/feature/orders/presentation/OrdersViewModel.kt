@@ -2,7 +2,6 @@ package com.exerovv.deadpixel.feature.orders.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.exerovv.deadpixel.core.network.ApiResult
 import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrdersUseCase
 import com.exerovv.deadpixel.feature.orders.presentation.state.OrdersUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,10 +25,9 @@ class OrdersViewModel @Inject constructor(
     fun load() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
-            when (val result = getOrders()) {
-                is ApiResult.Success -> _state.update { it.copy(orders = result.data, isLoading = false) }
-                is ApiResult.Error -> _state.update { it.copy(error = result.message ?: "Ошибка загрузки", isLoading = false) }
-            }
+            runCatching { getOrders() }
+                .onSuccess { orders -> _state.update { it.copy(orders = orders, isLoading = false) } }
+                .onFailure { e -> _state.update { it.copy(error = e.message ?: "Ошибка загрузки", isLoading = false) } }
         }
     }
 }

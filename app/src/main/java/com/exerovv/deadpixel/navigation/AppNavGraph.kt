@@ -8,6 +8,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.exerovv.deadpixel.feature.auth.presentation.login.LoginScreen
 import com.exerovv.deadpixel.feature.auth.presentation.register.RegisterScreen
+import com.exerovv.deadpixel.feature.diagnostics.presentation.DiagnosticsScreen
 import com.exerovv.deadpixel.feature.orders.presentation.detail.OrderDetailScreen
 import com.exerovv.deadpixel.ui.MainScreen
 
@@ -17,6 +18,9 @@ sealed class Screen(val route: String) {
     data object Main : Screen("main")
     data object OrderDetail : Screen("order/{orderId}") {
         fun createRoute(orderId: Int) = "order/$orderId"
+    }
+    data object Diagnostics : Screen("diagnostics/{orderId}") {
+        fun createRoute(orderId: Int) = "diagnostics/$orderId"
     }
 }
 
@@ -69,6 +73,17 @@ fun NavGraph(isLoggedIn: Boolean) {
             arguments = listOf(navArgument("orderId") { type = NavType.IntType })
         ) {
             OrderDetailScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToDiagnostics = { orderId ->
+                    navController.navigate(Screen.Diagnostics.createRoute(orderId))
+                }
+            )
+        }
+        composable(
+            route = Screen.Diagnostics.route,
+            arguments = listOf(navArgument("orderId") { type = NavType.IntType })
+        ) {
+            DiagnosticsScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }

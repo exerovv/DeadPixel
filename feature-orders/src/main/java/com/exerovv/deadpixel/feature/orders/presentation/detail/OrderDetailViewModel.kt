@@ -3,7 +3,6 @@ package com.exerovv.deadpixel.feature.orders.presentation.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.exerovv.deadpixel.core.network.ApiResult
 import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrderAssignmentUseCase
 import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrderByIdUseCase
 import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrderHistoryUseCase
@@ -39,21 +38,13 @@ class OrderDetailViewModel @Inject constructor(
     private fun load() {
         viewModelScope.launch {
             _state.value = OrderDetailUiState.Loading
-
-            val orderResult = getOrderById(orderId)
-            if (orderResult is ApiResult.Error) {
-                _state.value = OrderDetailUiState.Error(orderResult.message ?: "Ошибка загрузки")
-                return@launch
-            }
-            val order = (orderResult as ApiResult.Success).data
-
-            val assignmentDeferred = async { getOrderAssignment(orderId) }
-            val historyDeferred = async { getOrderHistory(orderId) }
-
-            val assignment = (assignmentDeferred.await() as? ApiResult.Success)?.data
-            val history = (historyDeferred.await() as? ApiResult.Success)?.data ?: emptyList()
-
-            _state.value = OrderDetailUiState.Success(order, assignment, history)
+            runCatching { getOrderById(orderId) }
+                .onSuccess { order ->
+                    val assignmentDeferred = async { runCatching { getOrderAssignment(orderId) }.getOrNull() }
+                    val historyDeferred = async { runCatching { getOrderHistory(orderId) }.getOrElse { emptyList() } }
+                    _state.value = OrderDetailUiState.Success(order, assignmentDeferred.await(), historyDeferred.await())
+                }
+                .onFailure { e -> _state.value = OrderDetailUiState.Error(e.message ?: "Ошибка загрузки") }
         }
     }
 }

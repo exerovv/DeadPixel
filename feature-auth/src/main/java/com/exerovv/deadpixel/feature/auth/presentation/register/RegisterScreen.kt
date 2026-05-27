@@ -78,7 +78,7 @@ fun RegisterScreen(
         Text(
             text = stringResource(R.string.register_title),
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(32.dp))
         OutlinedTextField(

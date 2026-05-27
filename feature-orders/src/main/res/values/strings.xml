@@ -19,4 +19,6 @@
     <string name="status_ready">Готов</string>
     <string name="status_completed">Завершён</string>
     <string name="status_cancelled">Отменён</string>
+    <string name="section_diagnostics">Диагностика</string>
+    <string name="action_view_diagnostics">Открыть</string>
 </resources>

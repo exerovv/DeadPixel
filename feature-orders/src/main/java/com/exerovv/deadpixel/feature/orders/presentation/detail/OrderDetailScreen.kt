@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -48,11 +49,15 @@ import com.exerovv.deadpixel.feature.orders.domain.model.Order
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderAssignment
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatus
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatusHistory
+import com.exerovv.deadpixel.feature.orders.presentation.StatusChip
+import com.exerovv.deadpixel.feature.orders.presentation.label
+import com.exerovv.deadpixel.feature.orders.presentation.statusColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrderDetailScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToDiagnostics: (Int) -> Unit = {},
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -110,6 +115,7 @@ fun OrderDetailScreen(
                     order = s.order,
                     assignment = s.assignment,
                     history = s.history,
+                    onNavigateToDiagnostics = { onNavigateToDiagnostics(s.order.id) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -122,6 +128,7 @@ private fun OrderDetailContent(
     order: Order,
     assignment: OrderAssignment?,
     history: List<OrderStatusHistory>,
+    onNavigateToDiagnostics: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -137,6 +144,7 @@ private fun OrderDetailContent(
         if (assignment != null) {
             item { AssignmentSection(assignment) }
         }
+        item { DiagnosticsSection(onNavigateToDiagnostics) }
         if (history.isNotEmpty()) {
             item {
                 SectionLabel(stringResource(R.string.section_history))
@@ -199,6 +207,39 @@ private fun AssignmentSection(assignment: OrderAssignment) {
 }
 
 @Composable
+private fun DiagnosticsSection(onNavigate: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            SectionLabel(stringResource(R.string.section_diagnostics))
+            Button(
+                onClick = onNavigate,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text(stringResource(R.string.action_view_diagnostics))
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun HistoryItem(entry: OrderStatusHistory) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -232,7 +273,7 @@ private fun HistoryItem(entry: OrderStatusHistory) {
                     text = entry.newStatus.label(),
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
-                    color = statusColor(entry.newStatus)
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             Text(
@@ -276,46 +317,8 @@ private fun SectionLabel(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.titleSmall,
-        color = MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.onBackground,
         fontWeight = FontWeight.Bold
     )
 }
 
-@Composable
-private fun StatusChip(status: OrderStatus, large: Boolean = false) {
-    val color = statusColor(status)
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(color.copy(alpha = 0.15f))
-            .padding(horizontal = if (large) 14.dp else 10.dp, vertical = if (large) 6.dp else 4.dp)
-    ) {
-        Text(
-            text = status.label(),
-            style = if (large) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.labelSmall,
-            color = color,
-            fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-private fun statusColor(status: OrderStatus): Color = when (status) {
-    OrderStatus.RECEIVED -> Color(0xFF7F52FF)
-    OrderStatus.DIAGNOSED -> Color(0xFF7F52FF)
-    OrderStatus.IN_PROGRESS -> Color(0xFFF88909)
-    OrderStatus.WAITING_PARTS -> Color(0xFFFFC107)
-    OrderStatus.READY -> Color(0xFF4CAF50)
-    OrderStatus.COMPLETED -> Color(0xFFC0C0C2)
-    OrderStatus.CANCELLED -> Color(0xFFCF6679)
-}
-
-@Composable
-private fun OrderStatus.label(): String = when (this) {
-    OrderStatus.RECEIVED -> stringResource(R.string.status_received)
-    OrderStatus.DIAGNOSED -> stringResource(R.string.status_diagnosed)
-    OrderStatus.IN_PROGRESS -> stringResource(R.string.status_in_progress)
-    OrderStatus.WAITING_PARTS -> stringResource(R.string.status_waiting_parts)
-    OrderStatus.READY -> stringResource(R.string.status_ready)
-    OrderStatus.COMPLETED -> stringResource(R.string.status_completed)
-    OrderStatus.CANCELLED -> stringResource(R.string.status_cancelled)
-}

@@ -2,7 +2,6 @@ package com.exerovv.deadpixel.feature.auth.presentation.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.exerovv.deadpixel.core.network.ApiResult
 import com.exerovv.deadpixel.feature.auth.domain.usecase.LoginUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,12 +46,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val s = _state.value
-            when (val result = loginUseCase(s.email, s.password)) {
-                is ApiResult.Success -> _state.update { it.copy(isLoading = false, isSuccess = true) }
-                is ApiResult.Error -> _state.update {
-                    it.copy(isLoading = false, error = result.message ?: "Ошибка входа")
-                }
-            }
+            runCatching { loginUseCase(s.email, s.password) }
+                .onSuccess { _state.update { it.copy(isLoading = false, isSuccess = true) } }
+                .onFailure { e -> _state.update { it.copy(isLoading = false, error = e.message ?: "Ошибка входа") } }
         }
     }
 }

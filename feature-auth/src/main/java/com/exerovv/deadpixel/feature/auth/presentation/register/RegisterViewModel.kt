@@ -2,7 +2,6 @@ package com.exerovv.deadpixel.feature.auth.presentation.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.exerovv.deadpixel.core.network.ApiResult
 import com.exerovv.deadpixel.core.network.UserRole
 import com.exerovv.deadpixel.feature.auth.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,12 +53,9 @@ class RegisterViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
             val s = _state.value
-            when (val result = registerUseCase(s.name, s.email, s.password, s.role.name)) {
-                is ApiResult.Success -> _state.update { it.copy(isLoading = false, isSuccess = true) }
-                is ApiResult.Error -> _state.update {
-                    it.copy(isLoading = false, error = result.message ?: "Ошибка регистрации")
-                }
-            }
+            runCatching { registerUseCase(s.name, s.email, s.password, s.role.name) }
+                .onSuccess { _state.update { it.copy(isLoading = false, isSuccess = true) } }
+                .onFailure { e -> _state.update { it.copy(isLoading = false, error = e.message ?: "Ошибка регистрации") } }
         }
     }
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="diagnostics_title">Диагностика</string>
+    <string name="diagnostics_not_found">Диагностика не назначена</string>
+    <string name="diagnostics_section_info">Информация</string>
+    <string name="diagnostics_section_result">Результат</string>
+    <string name="diagnostics_section_actions">Действия</string>
+    <string name="field_performed_by">Исполнитель</string>
+    <string name="field_performed_by_value">Мастер #%d</string>
+    <string name="field_started_at">Начата</string>
+    <string name="field_completed_at">Завершена</string>
+    <string name="field_detected_issues">Обнаруженные проблемы</string>
+    <string name="status_pending">Ожидает</string>
+    <string name="status_in_progress">В процессе</string>
+    <string name="status_completed">Завершена</string>
+    <string name="status_failed">Провалена</string>
+    <string name="action_simulate">Начать симуляцию</string>
+    <string name="action_complete">Завершить</string>
+    <string name="action_fail">Провалить</string>
+    <string name="action_retry">Повторить</string>
+    <string name="action_back">Назад</string>
+    <string name="dialog_complete_title">Завершить диагностику</string>
+    <string name="dialog_hint_result">Результат</string>
+    <string name="dialog_hint_issues">Обнаруженные проблемы (необязательно)</string>
+    <string name="dialog_confirm">Подтвердить</string>
+    <string name="dialog_cancel">Отмена</string>
+</resources>

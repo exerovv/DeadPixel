@@ -18,4 +18,10 @@ interface OrdersApi {
 
     @GET("api/orders/{id}/history")
     suspend fun getOrderHistory(@Path("id") orderId: Int): List<OrderStatusHistoryDto>
+
+    @GET("api/orders/master/{masterId}")
+    suspend fun getOrdersByMaster(@Path("masterId") masterId: Int): List<OrderDto>
+
+    @GET("api/orders/status/{status}")
+    suspend fun getOrdersByStatus(@Path("status") status: String): List<OrderDto>
 }

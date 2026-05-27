@@ -38,4 +38,23 @@ class TokenManager @Inject constructor(
                 .remove("refresh_token")
         }
     }
+
+    fun getUserId(): Int? {
+        val payload = decodePayload() ?: return null
+        return Regex(""""sub"\s*:\s*"?(\d+)"?""").find(payload)?.groupValues?.get(1)?.toIntOrNull()
+    }
+
+    fun getUserRole(): UserRole? {
+        val payload = decodePayload() ?: return null
+        val raw = Regex(""""role"\s*:\s*"([^"]+)"""").find(payload)?.groupValues?.get(1)
+        return raw?.let { runCatching { UserRole.valueOf(it) }.getOrNull() }
+    }
+
+    private fun decodePayload(): String? {
+        val token = getAccessToken() ?: return null
+        return runCatching {
+            val encoded = token.split(".").getOrNull(1) ?: return null
+            String(android.util.Base64.decode(encoded, android.util.Base64.URL_SAFE or android.util.Base64.NO_PADDING))
+        }.getOrNull()
+    }
 }

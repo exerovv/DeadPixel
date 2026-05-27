@@ -1,8 +1,6 @@
 package com.exerovv.deadpixel.feature.auth.data.repository
 
-import com.exerovv.deadpixel.core.network.ApiResult
 import com.exerovv.deadpixel.core.network.TokenManager
-import com.exerovv.deadpixel.core.network.safeApiCall
 import com.exerovv.deadpixel.feature.auth.data.remote.AuthApiService
 import com.exerovv.deadpixel.feature.auth.data.remote.dto.LoginRequest
 import com.exerovv.deadpixel.feature.auth.data.remote.dto.RefreshTokenRequest
@@ -17,34 +15,22 @@ class AuthRepositoryImpl @Inject constructor(
     private val tokenManager: TokenManager
 ) : AuthRepository {
 
-    override suspend fun login(email: String, password: String): ApiResult<Unit> {
-        return when (val result = safeApiCall { apiService.login(LoginRequest(email, password)) }) {
-            is ApiResult.Success -> {
-                tokenManager.saveTokens(result.data.token, result.data.refreshToken)
-                ApiResult.Success(Unit)
-            }
-            is ApiResult.Error -> result
-        }
+    override suspend fun login(email: String, password: String) {
+        val response = apiService.login(LoginRequest(email, password))
+        tokenManager.saveTokens(response.token, response.refreshToken)
     }
 
-    override suspend fun register(name: String, email: String, password: String, role: String): ApiResult<Unit> {
-        return when (val result = safeApiCall { apiService.register(RegisterRequest(name, email, password, role)) }) {
-            is ApiResult.Success -> {
-                tokenManager.saveTokens(result.data.token, result.data.refreshToken)
-                ApiResult.Success(Unit)
-            }
-            is ApiResult.Error -> result
-        }
+    override suspend fun register(name: String, email: String, password: String, role: String) {
+        val response = apiService.register(RegisterRequest(name, email, password, role))
+        tokenManager.saveTokens(response.token, response.refreshToken)
     }
 
-    override suspend fun logout(): ApiResult<Unit> {
-        val refreshToken = tokenManager.getRefreshToken() ?: run {
-            tokenManager.clearTokens()
-            return ApiResult.Success(Unit)
+    override suspend fun logout() {
+        val refreshToken = tokenManager.getRefreshToken()
+        if (refreshToken != null) {
+            runCatching { apiService.logout(RefreshTokenRequest(refreshToken)) }
         }
-        safeApiCall { apiService.logout(RefreshTokenRequest(refreshToken)) }
         tokenManager.clearTokens()
-        return ApiResult.Success(Unit)
     }
 
     override fun isLoggedIn(): Boolean = tokenManager.getAccessToken() != null

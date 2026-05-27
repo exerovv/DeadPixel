@@ -43,6 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.exerovv.deadpixel.feature.orders.R
 import com.exerovv.deadpixel.feature.orders.domain.model.Order
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatus
+import com.exerovv.deadpixel.feature.orders.presentation.state.OrdersUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,10 +53,20 @@ fun OrdersScreen(
     viewModel: OrdersViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    OrdersList(state = state, onRefresh = viewModel::load, onOrderClick = onOrderClick, modifier = modifier)
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun OrdersList(
+    state: OrdersUiState,
+    onRefresh: () -> Unit,
+    onOrderClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
     PullToRefreshBox(
         isRefreshing = state.isLoading && state.orders.isNotEmpty(),
-        onRefresh = { viewModel.load() },
+        onRefresh = onRefresh,
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
@@ -79,7 +90,7 @@ fun OrdersScreen(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(Modifier.height(16.dp))
-                    Button(onClick = { viewModel.load() }) {
+                    Button(onClick = onRefresh) {
                         Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.action_retry))
@@ -169,7 +180,7 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
                         Text(
                             text = "${cost.toInt()} ₽",
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurface,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -180,35 +191,34 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
 }
 
 @Composable
-private fun StatusChip(status: OrderStatus) {
-    val color = statusColor(status)
+internal fun StatusChip(status: OrderStatus, large: Boolean = false) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(color.copy(alpha = 0.15f))
-            .padding(horizontal = 10.dp, vertical = 4.dp)
+            .background(statusColor(status))
+            .padding(horizontal = if (large) 14.dp else 10.dp, vertical = if (large) 6.dp else 4.dp)
     ) {
         Text(
             text = status.label(),
-            style = MaterialTheme.typography.labelSmall,
-            color = color,
+            style = if (large) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.labelSmall,
+            color = Color.White,
             fontWeight = FontWeight.Bold
         )
     }
 }
 
-private fun statusColor(status: OrderStatus): Color = when (status) {
+internal fun statusColor(status: OrderStatus): Color = when (status) {
     OrderStatus.RECEIVED -> Color(0xFF7F52FF)
     OrderStatus.DIAGNOSED -> Color(0xFF7F52FF)
     OrderStatus.IN_PROGRESS -> Color(0xFFF88909)
-    OrderStatus.WAITING_PARTS -> Color(0xFFFFC107)
+    OrderStatus.WAITING_PARTS -> Color(0xFFD4900A)
     OrderStatus.READY -> Color(0xFF4CAF50)
-    OrderStatus.COMPLETED -> Color(0xFFC0C0C2)
+    OrderStatus.COMPLETED -> Color(0xFF757575)
     OrderStatus.CANCELLED -> Color(0xFFCF6679)
 }
 
 @Composable
-private fun OrderStatus.label(): String = when (this) {
+internal fun OrderStatus.label(): String = when (this) {
     OrderStatus.RECEIVED -> stringResource(R.string.status_received)
     OrderStatus.DIAGNOSED -> stringResource(R.string.status_diagnosed)
     OrderStatus.IN_PROGRESS -> stringResource(R.string.status_in_progress)

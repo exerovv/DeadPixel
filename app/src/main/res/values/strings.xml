@@ -2,4 +2,12 @@
 <resources>
     <string name="app_name">DeadPixel</string>
     <string name="action_logout">Выйти</string>
+    <string name="tab_orders">Заказы</string>
+    <string name="tab_my_work">Мои</string>
+    <string name="tab_profile">Профиль</string>
+    <string name="my_work_title_master">Мои заказы</string>
+    <string name="my_work_title_manager">Нераспределённые</string>
+    <string name="profile_id">ID: %d</string>
+    <string name="role_master">Мастер</string>
+    <string name="role_manager">Менеджер</string>
 </resources>
