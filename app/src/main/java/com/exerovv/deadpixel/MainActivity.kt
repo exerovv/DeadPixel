@@ -5,10 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.remember
-import androidx.navigation.compose.rememberNavController
 import com.exerovv.deadpixel.core.network.TokenManager
 import com.exerovv.deadpixel.core.ui.theme.DeadPixelTheme
-import com.exerovv.deadpixel.navigation.AppNavGraph
+import com.exerovv.deadpixel.navigation.NavGraph
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -23,12 +22,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DeadPixelTheme {
-                val navController = rememberNavController()
                 val isLoggedIn = remember { tokenManager.getAccessToken() != null }
-                AppNavGraph(
-                    navController = navController,
-                    isLoggedIn = isLoggedIn
-                )
+                NavGraph(isLoggedIn = isLoggedIn)
             }
         }
     }
