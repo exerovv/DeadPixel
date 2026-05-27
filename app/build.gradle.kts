@@ -79,6 +79,20 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    // Core modules
+    implementation(project(":core-network"))
+    implementation(project(":core-ui"))
+    implementation(project(":core-database"))
+    // Feature modules
+    implementation(project(":feature-auth"))
+    implementation(project(":feature-users"))
+    implementation(project(":feature-equipment"))
+    implementation(project(":feature-orders"))
+    implementation(project(":feature-diagnostics"))
+    implementation(project(":feature-notifications"))
+    implementation(project(":feature-workplans"))
+    implementation(project(":feature-reports"))
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -24,4 +24,18 @@ dependencyResolutionManagement {
 
 rootProject.name = "DeadPixel"
 include(":app")
- 
+
+// Core modules
+include(":core-network")
+include(":core-ui")
+include(":core-database")
+
+// Feature modules
+include(":feature-auth")
+include(":feature-users")
+include(":feature-equipment")
+include(":feature-orders")
+include(":feature-diagnostics")
+include(":feature-notifications")
+include(":feature-workplans")
+include(":feature-reports")
