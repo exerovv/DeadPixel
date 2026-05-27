@@ -35,12 +35,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.exerovv.deadpixel.core.network.UserRole
+import com.exerovv.deadpixel.feature.auth.R
 
 @Composable
 fun RegisterScreen(
@@ -59,7 +61,10 @@ fun RegisterScreen(
 
     var passwordVisible by remember { mutableStateOf(false) }
     val roles = listOf(UserRole.MASTER, UserRole.MANAGER)
-    val roleLabels = listOf("Мастер", "Менеджер")
+    val roleLabels = listOf(
+        stringResource(R.string.role_master),
+        stringResource(R.string.role_manager)
+    )
 
     Column(
         modifier = Modifier
@@ -71,7 +76,7 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Регистрация",
+            text = stringResource(R.string.register_title),
             style = MaterialTheme.typography.headlineLarge,
             color = MaterialTheme.colorScheme.primary
         )
@@ -79,7 +84,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.name,
             onValueChange = { viewModel.processCommand(RegisterCommand.UpdateName(it)) },
-            label = { Text("Имя") },
+            label = { Text(stringResource(R.string.label_name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
@@ -87,7 +92,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.email,
             onValueChange = { viewModel.processCommand(RegisterCommand.UpdateEmail(it)) },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.label_email)) },
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
@@ -96,7 +101,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = state.password,
             onValueChange = { viewModel.processCommand(RegisterCommand.UpdatePassword(it)) },
-            label = { Text("Пароль") },
+            label = { Text(stringResource(R.string.label_password)) },
             singleLine = true,
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -148,12 +153,12 @@ fun RegisterScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Зарегистрироваться")
+                Text(stringResource(R.string.action_register))
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
         TextButton(onClick = onNavigateToLogin) {
-            Text("Уже есть аккаунт? Войти")
+            Text(stringResource(R.string.register_go_to_login))
         }
     }
 }

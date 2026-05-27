@@ -14,7 +14,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.exerovv.deadpixel.R
 import com.exerovv.deadpixel.MainViewModel
 import com.exerovv.deadpixel.feature.orders.presentation.OrdersScreen
 
@@ -22,6 +24,7 @@ import com.exerovv.deadpixel.feature.orders.presentation.OrdersScreen
 @Composable
 fun MainScreen(
     onLogout: () -> Unit,
+    onNavigateToOrderDetail: (Int) -> Unit,
     viewModel: MainViewModel = hiltViewModel()
 ) {
     Scaffold(
@@ -29,9 +32,9 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "DeadPixel",
+                        text = stringResource(R.string.app_name),
                         style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 actions = {
@@ -41,7 +44,7 @@ fun MainScreen(
                     }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Выйти",
+                            contentDescription = stringResource(R.string.action_logout),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -53,6 +56,9 @@ fun MainScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        OrdersScreen(modifier = Modifier.fillMaxSize().padding(padding))
+        OrdersScreen(
+            modifier = Modifier.fillMaxSize().padding(padding),
+            onOrderClick = onNavigateToOrderDetail
+        )
     }
 }

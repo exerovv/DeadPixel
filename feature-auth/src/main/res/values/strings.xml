@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">DeadPixel</string>
+    <string name="login_subtitle">Войдите в аккаунт</string>
+    <string name="label_email">Email</string>
+    <string name="label_password">Пароль</string>
+    <string name="label_name">Имя</string>
+    <string name="action_login">Войти</string>
+    <string name="login_go_to_register">Нет аккаунта? Зарегистрироваться</string>
+    <string name="register_title">Регистрация</string>
+    <string name="role_master">Мастер</string>
+    <string name="role_manager">Менеджер</string>
+    <string name="action_register">Зарегистрироваться</string>
+    <string name="register_go_to_login">Уже есть аккаунт? Войти</string>
+</resources>

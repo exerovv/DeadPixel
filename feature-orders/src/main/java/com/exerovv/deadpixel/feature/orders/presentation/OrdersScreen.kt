@@ -1,6 +1,7 @@
 package com.exerovv.deadpixel.feature.orders.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,9 +23,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,48 +35,68 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.exerovv.deadpixel.feature.orders.R
 import com.exerovv.deadpixel.feature.orders.domain.model.Order
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatus
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrdersScreen(
     modifier: Modifier = Modifier,
+    onOrderClick: (Int) -> Unit = {},
     viewModel: OrdersViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
 
-    Box(
+    PullToRefreshBox(
+        isRefreshing = state.isLoading && state.orders.isNotEmpty(),
+        onRefresh = { viewModel.load() },
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.background)
     ) {
         when {
-            state.isLoading -> CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            state.isLoading && state.orders.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
 
-            state.error != null -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = state.error!!,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Spacer(Modifier.height(16.dp))
-                Button(onClick = { viewModel.load() }) {
-                    Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text("Повторить")
+            state.error != null && state.orders.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = state.error!!,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(Modifier.height(16.dp))
+                    Button(onClick = { viewModel.load() }) {
+                        Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(stringResource(R.string.action_retry))
+                    }
                 }
             }
 
-            state.orders.isEmpty() -> Text(
-                text = "Заказов нет",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            state.orders.isEmpty() -> Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.orders_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
             else -> LazyColumn(
                 modifier = Modifier.fillMaxSize(),
@@ -84,7 +107,7 @@ fun OrdersScreen(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(state.orders) { order ->
-                    OrderCard(order = order)
+                    OrderCard(order = order, onClick = { onOrderClick(order.id) })
                 }
             }
         }
@@ -92,9 +115,9 @@ fun OrdersScreen(
 }
 
 @Composable
-private fun OrderCard(order: Order) {
+private fun OrderCard(order: Order, onClick: () -> Unit) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -184,12 +207,13 @@ private fun statusColor(status: OrderStatus): Color = when (status) {
     OrderStatus.CANCELLED -> Color(0xFFCF6679)
 }
 
+@Composable
 private fun OrderStatus.label(): String = when (this) {
-    OrderStatus.RECEIVED -> "Принят"
-    OrderStatus.DIAGNOSED -> "Диагностирован"
-    OrderStatus.IN_PROGRESS -> "В работе"
-    OrderStatus.WAITING_PARTS -> "Ожидание запчастей"
-    OrderStatus.READY -> "Готов"
-    OrderStatus.COMPLETED -> "Завершён"
-    OrderStatus.CANCELLED -> "Отменён"
+    OrderStatus.RECEIVED -> stringResource(R.string.status_received)
+    OrderStatus.DIAGNOSED -> stringResource(R.string.status_diagnosed)
+    OrderStatus.IN_PROGRESS -> stringResource(R.string.status_in_progress)
+    OrderStatus.WAITING_PARTS -> stringResource(R.string.status_waiting_parts)
+    OrderStatus.READY -> stringResource(R.string.status_ready)
+    OrderStatus.COMPLETED -> stringResource(R.string.status_completed)
+    OrderStatus.CANCELLED -> stringResource(R.string.status_cancelled)
 }

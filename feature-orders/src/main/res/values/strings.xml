@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_retry">Повторить</string>
+    <string name="action_back">Назад</string>
+    <string name="orders_empty">Заказов нет</string>
+    <string name="order_detail_fallback_title">Заказ</string>
+    <string name="section_info">Информация</string>
+    <string name="section_master">Мастер</string>
+    <string name="section_history">История статусов</string>
+    <string name="field_created_at">Создан</string>
+    <string name="field_deadline">Дедлайн</string>
+    <string name="field_cost">Стоимость</string>
+    <string name="field_master_id">ID мастера</string>
+    <string name="field_assigned_at">Назначен</string>
+    <string name="status_received">Принят</string>
+    <string name="status_diagnosed">Диагностирован</string>
+    <string name="status_in_progress">В работе</string>
+    <string name="status_waiting_parts">Ожидание запчастей</string>
+    <string name="status_ready">Готов</string>
+    <string name="status_completed">Завершён</string>
+    <string name="status_cancelled">Отменён</string>
+</resources>
