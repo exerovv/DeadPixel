@@ -19,7 +19,7 @@ dependencies {
     api(libs.converter.kotlinx.serialization)
     api(libs.kotlinx.serialization.json)
     implementation(libs.coil.network.okhttp)
-    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
     implementation(libs.hilt.android)
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.core.ktx)
