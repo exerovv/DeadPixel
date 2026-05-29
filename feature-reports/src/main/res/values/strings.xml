@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common actions -->
+    <string name="action_retry">Повторить</string>
+    <string name="action_back">Назад</string>
+
+    <!-- Reports list -->
+    <string name="reports_fab_desc">Создать отчёт</string>
+    <string name="reports_filter_all">Все</string>
+    <string name="reports_empty">Отчёты не найдены</string>
+    <string name="reports_generated_at">Создан: %s</string>
+
+    <!-- Report types (full) -->
+    <string name="report_type_completed_orders">Выполненные заказы</string>
+    <string name="report_type_revenue">Выручка</string>
+    <string name="report_type_master_performance">Эффективность мастеров</string>
+    <string name="report_type_deadline_violations">Нарушения сроков</string>
+
+    <!-- Report type chips (short) -->
+    <string name="report_type_chip_completed_orders">Заказы</string>
+    <string name="report_type_chip_revenue">Выручка</string>
+    <string name="report_type_chip_master_performance">Мастера</string>
+    <string name="report_type_chip_deadline_violations">Сроки</string>
+
+    <!-- Report detail -->
+    <string name="report_detail_title_fallback">Отчёт</string>
+    <string name="report_section_period">Период</string>
+    <string name="report_field_from">С</string>
+    <string name="report_field_to">По</string>
+    <string name="report_field_created">Создан</string>
+    <string name="report_section_data">Данные отчёта</string>
+
+    <!-- Generate report -->
+    <string name="generate_report_title">Новый отчёт</string>
+    <string name="generate_report_field_type">Тип отчёта</string>
+    <string name="generate_report_field_period_start">Начало периода (ГГГГ-ММ-ДД)</string>
+    <string name="generate_report_field_period_end">Конец периода (ГГГГ-ММ-ДД)</string>
+    <string name="generate_report_placeholder_start">2024-01-01</string>
+    <string name="generate_report_placeholder_end">2024-12-31</string>
+    <string name="generate_report_button">Сформировать отчёт</string>
+</resources>

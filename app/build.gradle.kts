@@ -86,7 +86,6 @@ dependencies {
     implementation(project(":core-database"))
     // Feature modules
     implementation(project(":feature-auth"))
-    implementation(project(":feature-users"))
     implementation(project(":feature-equipment"))
     implementation(project(":feature-orders"))
     implementation(project(":feature-diagnostics"))
