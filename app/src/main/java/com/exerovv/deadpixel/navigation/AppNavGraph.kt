@@ -12,6 +12,7 @@ import com.exerovv.deadpixel.feature.diagnostics.presentation.DiagnosticsScreen
 import com.exerovv.deadpixel.feature.orders.presentation.detail.OrderDetailScreen
 import com.exerovv.deadpixel.feature.reports.presentation.detail.ReportDetailScreen
 import com.exerovv.deadpixel.feature.reports.presentation.generate.GenerateReportScreen
+import com.exerovv.deadpixel.feature.workplans.presentation.WorkPlanScreen
 import com.exerovv.deadpixel.ui.MainScreen
 
 sealed class Screen(val route: String) {
@@ -28,6 +29,9 @@ sealed class Screen(val route: String) {
         fun createRoute(reportId: Int) = "report-detail/$reportId"
     }
     data object GenerateReport : Screen("generate-report")
+    data object WorkPlan : Screen("workplan/{orderId}") {
+        fun createRoute(orderId: Int) = "workplan/$orderId"
+    }
 }
 
 @Composable
@@ -88,6 +92,9 @@ fun NavGraph(isLoggedIn: Boolean) {
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToDiagnostics = { orderId ->
                     navController.navigate(Screen.Diagnostics.createRoute(orderId))
+                },
+                onNavigateToWorkPlan = { orderId ->
+                    navController.navigate(Screen.WorkPlan.createRoute(orderId))
                 }
             )
         }
@@ -115,6 +122,14 @@ fun NavGraph(isLoggedIn: Boolean) {
                         popUpTo(Screen.GenerateReport.route) { inclusive = true }
                     }
                 }
+            )
+        }
+        composable(
+            route = Screen.WorkPlan.route,
+            arguments = listOf(navArgument("orderId") { type = NavType.IntType })
+        ) {
+            WorkPlanScreen(
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

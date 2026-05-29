@@ -39,7 +39,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -47,7 +46,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.exerovv.deadpixel.feature.orders.R
 import com.exerovv.deadpixel.feature.orders.domain.model.Order
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderAssignment
-import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatus
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatusHistory
 import com.exerovv.deadpixel.feature.orders.presentation.StatusChip
 import com.exerovv.deadpixel.feature.orders.presentation.label
@@ -58,6 +56,7 @@ import com.exerovv.deadpixel.feature.orders.presentation.statusColor
 fun OrderDetailScreen(
     onNavigateBack: () -> Unit,
     onNavigateToDiagnostics: (Int) -> Unit = {},
+    onNavigateToWorkPlan: (Int) -> Unit = {},
     viewModel: OrderDetailViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -116,6 +115,7 @@ fun OrderDetailScreen(
                     assignment = s.assignment,
                     history = s.history,
                     onNavigateToDiagnostics = { onNavigateToDiagnostics(s.order.id) },
+                    onNavigateToWorkPlan = { onNavigateToWorkPlan(s.order.id) },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -129,6 +129,7 @@ private fun OrderDetailContent(
     assignment: OrderAssignment?,
     history: List<OrderStatusHistory>,
     onNavigateToDiagnostics: () -> Unit,
+    onNavigateToWorkPlan: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -145,6 +146,7 @@ private fun OrderDetailContent(
             item { AssignmentSection(assignment) }
         }
         item { DiagnosticsSection(onNavigateToDiagnostics) }
+        item { WorkPlanSection(onNavigateToWorkPlan) }
         if (history.isNotEmpty()) {
             item {
                 SectionLabel(stringResource(R.string.section_history))
@@ -228,6 +230,39 @@ private fun DiagnosticsSection(onNavigate: () -> Unit) {
                 )
             ) {
                 Text(stringResource(R.string.action_view_diagnostics))
+                Spacer(Modifier.width(4.dp))
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun WorkPlanSection(onNavigate: () -> Unit) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            SectionLabel(stringResource(R.string.section_workplan))
+            Button(
+                onClick = onNavigate,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondary
+                )
+            ) {
+                Text(stringResource(R.string.action_view_workplan))
                 Spacer(Modifier.width(4.dp))
                 Icon(
                     Icons.AutoMirrored.Filled.ArrowForward,

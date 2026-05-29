@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_retry">Повторить</string>
+    <string name="action_back">Назад</string>
+
+    <string name="workplan_title">Рабочий план</string>
+    <string name="workplan_not_found">Рабочий план не создан</string>
+    <string name="workplan_create">Создать план</string>
+    <string name="workplan_section_status">Статус плана</string>
+    <string name="workplan_section_items">Шаги</string>
+    <string name="workplan_items_empty">Шагов пока нет</string>
+    <string name="workplan_fab_add_desc">Добавить шаг</string>
+
+    <string name="workplan_status_pending">Ожидает</string>
+    <string name="workplan_status_in_progress">В работе</string>
+    <string name="workplan_status_completed">Завершён</string>
+    <string name="workplan_status_cancelled">Отменён</string>
+
+    <string name="workplan_item_status_todo">К выполнению</string>
+    <string name="workplan_item_status_in_progress">В работе</string>
+    <string name="workplan_item_status_done">Выполнен</string>
+    <string name="workplan_item_status_skipped">Пропущен</string>
+
+    <string name="workplan_dialog_add_title">Новый шаг</string>
+    <string name="workplan_dialog_add_hint">Описание шага</string>
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_add">Добавить</string>
+    <string name="workplan_dialog_plan_status_title">Статус плана</string>
+    <string name="workplan_dialog_item_status_title">Статус шага</string>
+</resources>

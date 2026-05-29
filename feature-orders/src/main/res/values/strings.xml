@@ -21,4 +21,6 @@
     <string name="status_cancelled">Отменён</string>
     <string name="section_diagnostics">Диагностика</string>
     <string name="action_view_diagnostics">Открыть</string>
+    <string name="section_workplan">Рабочий план</string>
+    <string name="action_view_workplan">Открыть</string>
 </resources>
