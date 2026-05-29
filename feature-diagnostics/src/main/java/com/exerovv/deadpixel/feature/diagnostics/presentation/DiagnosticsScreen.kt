@@ -127,6 +127,7 @@ fun DiagnosticsScreen(
                 is DiagnosticsUiState.Success -> {
                     DiagnosticsContent(
                         diagnostics = s.diagnostics,
+                        isMaster = viewModel.isMaster,
                         onCommand = { viewModel.processCommand(it) },
                         modifier = Modifier
                             .fillMaxSize()
@@ -151,6 +152,7 @@ fun DiagnosticsScreen(
 @Composable
 private fun DiagnosticsContent(
     diagnostics: Diagnostics,
+    isMaster: Boolean,
     onCommand: (DiagnosticsCommand) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -169,6 +171,7 @@ private fun DiagnosticsContent(
         }
         ActionsCard(
             status = diagnostics.status,
+            isMaster = isMaster,
             onSimulate = { onCommand(DiagnosticsCommand.Simulate) },
             onOpenComplete = { showCompleteDialog = true },
             onFail = { onCommand(DiagnosticsCommand.Fail) }
@@ -263,11 +266,12 @@ private fun ResultCard(diagnostics: Diagnostics) {
 @Composable
 private fun ActionsCard(
     status: DiagnosticStatus,
+    isMaster: Boolean,
     onSimulate: () -> Unit,
     onOpenComplete: () -> Unit,
     onFail: () -> Unit
 ) {
-    if (status == DiagnosticStatus.COMPLETED || status == DiagnosticStatus.FAILED) return
+    if (!isMaster || status == DiagnosticStatus.COMPLETED || status == DiagnosticStatus.FAILED) return
 
     Card(
         modifier = Modifier.fillMaxWidth(),

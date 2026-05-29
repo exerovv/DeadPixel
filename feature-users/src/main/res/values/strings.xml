@@ -4,6 +4,8 @@
     <string name="action_retry">Повторить</string>
     <string name="action_back">Назад</string>
     <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_deactivate_title">Деактивировать сотрудника?</string>
+    <string name="dialog_deactivate_message">Сотрудник потеряет доступ к приложению</string>
 
     <!-- Users list -->
     <string name="users_empty">Сотрудники не найдены</string>

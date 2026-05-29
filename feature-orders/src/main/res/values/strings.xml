@@ -39,7 +39,7 @@
     <string name="create_order_title">Новый заказ</string>
     <string name="create_order_field_description">Описание</string>
     <string name="create_order_field_equipment_id">ID оборудования</string>
-    <string name="create_order_field_deadline">Дедлайн (ГГГГ-ММ-ДД)</string>
+    <string name="create_order_field_deadline">Дедлайн</string>
     <string name="create_order_field_cost">Стоимость (₽)</string>
     <string name="create_order_submit">Создать</string>
 </resources>

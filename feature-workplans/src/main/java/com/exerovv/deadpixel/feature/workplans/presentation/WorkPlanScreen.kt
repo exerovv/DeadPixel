@@ -80,6 +80,7 @@ fun WorkPlanScreen(
     var showPlanStatusDialog by remember { mutableStateOf(false) }
     var itemStatusDialogTarget by remember { mutableStateOf<WorkPlanItem?>(null) }
     var showAddItemDialog by remember { mutableStateOf(false) }
+    var deleteConfirmItemId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -140,7 +141,7 @@ fun WorkPlanScreen(
                         isMaster = viewModel.isMaster,
                         onPlanStatusClick = { showPlanStatusDialog = true },
                         onItemStatusClick = { item -> itemStatusDialogTarget = item },
-                        onDeleteItem = { itemId -> viewModel.processCommand(WorkPlanCommand.DeleteItem(itemId)) },
+                        onDeleteItem = { itemId -> deleteConfirmItemId = itemId },
                         modifier = Modifier
                             .fillMaxSize()
                             .align(Alignment.TopStart)
@@ -189,6 +190,27 @@ fun WorkPlanScreen(
             onAdd = { description ->
                 viewModel.processCommand(WorkPlanCommand.AddItem(description))
                 showAddItemDialog = false
+            }
+        )
+    }
+
+    deleteConfirmItemId?.let { itemId ->
+        AlertDialog(
+            onDismissRequest = { deleteConfirmItemId = null },
+            title = { Text(stringResource(R.string.workplan_dialog_delete_title)) },
+            text = { Text(stringResource(R.string.workplan_dialog_delete_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.processCommand(WorkPlanCommand.DeleteItem(itemId))
+                    deleteConfirmItemId = null
+                }) {
+                    Text(stringResource(R.string.dialog_delete), color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deleteConfirmItemId = null }) {
+                    Text(stringResource(R.string.dialog_cancel))
+                }
             }
         )
     }

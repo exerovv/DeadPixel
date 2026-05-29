@@ -25,6 +25,9 @@
     <string name="workplan_dialog_add_hint">Описание шага</string>
     <string name="dialog_cancel">Отмена</string>
     <string name="dialog_add">Добавить</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="workplan_dialog_delete_title">Удалить шаг?</string>
+    <string name="workplan_dialog_delete_message">Это действие нельзя отменить</string>
     <string name="workplan_dialog_plan_status_title">Статус плана</string>
     <string name="workplan_dialog_item_status_title">Статус шага</string>
 </resources>

@@ -3,6 +3,8 @@ package com.exerovv.deadpixel.feature.diagnostics.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.exerovv.deadpixel.core.network.TokenManager
+import com.exerovv.deadpixel.core.network.UserRole
 import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.CompleteDiagnosticsUseCase
 import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.FailDiagnosticsUseCase
 import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.GetDiagnosticsByOrderUseCase
@@ -23,10 +25,12 @@ class DiagnosticsViewModel @Inject constructor(
     private val getDiagnosticsByOrder: GetDiagnosticsByOrderUseCase,
     private val simulate: SimulateDiagnosticsUseCase,
     private val complete: CompleteDiagnosticsUseCase,
-    private val fail: FailDiagnosticsUseCase
+    private val fail: FailDiagnosticsUseCase,
+    tokenManager: TokenManager
 ) : ViewModel() {
 
     private val orderId: Int = checkNotNull(savedStateHandle["orderId"])
+    val isMaster: Boolean = tokenManager.getUserRole() == UserRole.MASTER
 
     private val _state = MutableStateFlow<DiagnosticsUiState>(DiagnosticsUiState.Loading)
     val state: StateFlow<DiagnosticsUiState> = _state.asStateFlow()
