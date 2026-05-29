@@ -13,8 +13,11 @@ import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrderHistoryUseCas
 import com.exerovv.deadpixel.feature.orders.domain.usecase.UpdateOrderStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -36,6 +39,12 @@ class OrderDetailViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<OrderDetailUiState>(OrderDetailUiState.Loading)
     val state: StateFlow<OrderDetailUiState> = _state.asStateFlow()
+
+    private val _isActionLoading = MutableStateFlow(false)
+    val isActionLoading: StateFlow<Boolean> = _isActionLoading.asStateFlow()
+
+    private val _actionError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val actionError: SharedFlow<String> = _actionError.asSharedFlow()
 
     init { load() }
 
@@ -62,17 +71,19 @@ class OrderDetailViewModel @Inject constructor(
 
     private fun onUpdateStatus(status: OrderStatus, note: String?) {
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { updateOrderStatus(orderId, status, note) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = OrderDetailUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 
     private fun onAssignMaster(masterId: Int) {
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { assignMaster(orderId, masterId) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = OrderDetailUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 }

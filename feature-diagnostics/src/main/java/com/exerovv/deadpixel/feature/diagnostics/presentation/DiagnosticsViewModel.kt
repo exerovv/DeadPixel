@@ -8,8 +8,11 @@ import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.FailDiagnosticsU
 import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.GetDiagnosticsByOrderUseCase
 import com.exerovv.deadpixel.feature.diagnostics.domain.usecase.SimulateDiagnosticsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,6 +30,12 @@ class DiagnosticsViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<DiagnosticsUiState>(DiagnosticsUiState.Loading)
     val state: StateFlow<DiagnosticsUiState> = _state.asStateFlow()
+
+    private val _isActionLoading = MutableStateFlow(false)
+    val isActionLoading: StateFlow<Boolean> = _isActionLoading.asStateFlow()
+
+    private val _actionError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val actionError: SharedFlow<String> = _actionError.asSharedFlow()
 
     init { load() }
 
@@ -54,27 +63,31 @@ class DiagnosticsViewModel @Inject constructor(
     private fun onSimulate() {
         val current = (_state.value as? DiagnosticsUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { simulate(current.diagnostics.id) }
                 .onSuccess { _state.value = DiagnosticsUiState.Success(it) }
-                .onFailure { e -> _state.value = DiagnosticsUiState.Error(e.message ?: "Ошибка") }
+                .onFailure { e -> _actionError.tryEmit(e.message ?: "Ошибка") }
+            _isActionLoading.value = false
         }
     }
 
     private fun onComplete(result: String, detectedIssues: String?) {
         val current = (_state.value as? DiagnosticsUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { complete(current.diagnostics.id, result, detectedIssues) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = DiagnosticsUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 
     private fun onFail() {
         val current = (_state.value as? DiagnosticsUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { fail(current.diagnostics.id) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = DiagnosticsUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 }

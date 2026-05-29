@@ -7,8 +7,11 @@ import com.exerovv.deadpixel.core.network.UserRole
 import com.exerovv.deadpixel.feature.users.domain.usecase.GetUsersUseCase
 import com.exerovv.deadpixel.feature.users.domain.usecase.SetUserActiveUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -26,6 +29,9 @@ class UsersViewModel @Inject constructor(
     private val _state = MutableStateFlow(UsersUiState())
     val state: StateFlow<UsersUiState> = _state.asStateFlow()
 
+    private val _actionError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val actionError: SharedFlow<String> = _actionError.asSharedFlow()
+
     init { load() }
 
     fun load() {
@@ -41,7 +47,7 @@ class UsersViewModel @Inject constructor(
         viewModelScope.launch {
             runCatching { setUserActive(userId, !currentValue) }
                 .onSuccess { load() }
-                .onFailure { e -> _state.update { it.copy(error = e.message ?: "Ошибка") } }
+                .onFailure { e -> _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.foundation.background
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -30,11 +31,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,8 +63,15 @@ fun DiagnosticsScreen(
     viewModel: DiagnosticsViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val isActionLoading by viewModel.isActionLoading.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.actionError.collect { snackbarHostState.showSnackbar(it) }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.diagnostics_title), style = MaterialTheme.typography.titleLarge) },
@@ -113,13 +124,25 @@ fun DiagnosticsScreen(
                     }
                 }
 
-                is DiagnosticsUiState.Success -> DiagnosticsContent(
-                    diagnostics = s.diagnostics,
-                    onCommand = { viewModel.processCommand(it) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.TopStart)
-                )
+                is DiagnosticsUiState.Success -> {
+                    DiagnosticsContent(
+                        diagnostics = s.diagnostics,
+                        onCommand = { viewModel.processCommand(it) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.TopStart)
+                    )
+                    if (isActionLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
             }
         }
     }

@@ -14,8 +14,11 @@ import com.exerovv.deadpixel.feature.workplans.domain.usecase.GetWorkPlanByOrder
 import com.exerovv.deadpixel.feature.workplans.domain.usecase.UpdateWorkPlanItemStatusUseCase
 import com.exerovv.deadpixel.feature.workplans.domain.usecase.UpdateWorkPlanStatusUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -38,6 +41,12 @@ class WorkPlanViewModel @Inject constructor(
 
     private val _state = MutableStateFlow<WorkPlanUiState>(WorkPlanUiState.Loading)
     val state: StateFlow<WorkPlanUiState> = _state.asStateFlow()
+
+    private val _isActionLoading = MutableStateFlow(false)
+    val isActionLoading: StateFlow<Boolean> = _isActionLoading.asStateFlow()
+
+    private val _actionError = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    val actionError: SharedFlow<String> = _actionError.asSharedFlow()
 
     init { load() }
 
@@ -75,36 +84,41 @@ class WorkPlanViewModel @Inject constructor(
     private fun onUpdatePlanStatus(status: WorkPlanStatus) {
         val current = (_state.value as? WorkPlanUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { updatePlanStatus(current.plan.id, status) }
                 .onSuccess { plan -> _state.value = WorkPlanUiState.Success(plan) }
-                .onFailure { e -> _state.value = WorkPlanUiState.Error(e.message ?: "Ошибка") }
+                .onFailure { e -> _actionError.tryEmit(e.message ?: "Ошибка") }
+            _isActionLoading.value = false
         }
     }
 
     private fun onAddItem(description: String) {
         val current = (_state.value as? WorkPlanUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { addItem(current.plan.id, description) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = WorkPlanUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 
     private fun onUpdateItemStatus(itemId: Int, status: WorkPlanItemStatus) {
         val current = (_state.value as? WorkPlanUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { updateItemStatus(current.plan.id, itemId, status) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = WorkPlanUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 
     private fun onDeleteItem(itemId: Int) {
         val current = (_state.value as? WorkPlanUiState.Success) ?: return
         viewModelScope.launch {
+            _isActionLoading.value = true
             runCatching { deleteItem(current.plan.id, itemId) }
-                .onSuccess { load() }
-                .onFailure { e -> _state.value = WorkPlanUiState.Error(e.message ?: "Ошибка") }
+                .onSuccess { _isActionLoading.value = false; load() }
+                .onFailure { e -> _isActionLoading.value = false; _actionError.tryEmit(e.message ?: "Ошибка") }
         }
     }
 }

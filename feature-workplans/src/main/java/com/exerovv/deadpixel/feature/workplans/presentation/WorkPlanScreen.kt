@@ -1,5 +1,6 @@
 package com.exerovv.deadpixel.feature.workplans.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,12 +36,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,12 +70,19 @@ fun WorkPlanScreen(
     viewModel: WorkPlanViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val isActionLoading by viewModel.isActionLoading.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.actionError.collect { snackbarHostState.showSnackbar(it) }
+    }
 
     var showPlanStatusDialog by remember { mutableStateOf(false) }
     var itemStatusDialogTarget by remember { mutableStateOf<WorkPlanItem?>(null) }
     var showAddItemDialog by remember { mutableStateOf(false) }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -122,17 +133,29 @@ fun WorkPlanScreen(
                     onRetry = { viewModel.processCommand(WorkPlanCommand.Retry) }
                 )
 
-                is WorkPlanUiState.Success -> WorkPlanContent(
-                    plan = s.plan,
-                    isManager = viewModel.isManager,
-                    isMaster = viewModel.isMaster,
-                    onPlanStatusClick = { showPlanStatusDialog = true },
-                    onItemStatusClick = { item -> itemStatusDialogTarget = item },
-                    onDeleteItem = { itemId -> viewModel.processCommand(WorkPlanCommand.DeleteItem(itemId)) },
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .align(Alignment.TopStart)
-                )
+                is WorkPlanUiState.Success -> {
+                    WorkPlanContent(
+                        plan = s.plan,
+                        isManager = viewModel.isManager,
+                        isMaster = viewModel.isMaster,
+                        onPlanStatusClick = { showPlanStatusDialog = true },
+                        onItemStatusClick = { item -> itemStatusDialogTarget = item },
+                        onDeleteItem = { itemId -> viewModel.processCommand(WorkPlanCommand.DeleteItem(itemId)) },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.TopStart)
+                    )
+                    if (isActionLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.32f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    }
+                }
             }
         }
     }
