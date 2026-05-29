@@ -2,6 +2,8 @@ package com.exerovv.deadpixel.feature.orders.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.exerovv.deadpixel.core.network.TokenManager
+import com.exerovv.deadpixel.core.network.UserRole
 import com.exerovv.deadpixel.feature.orders.domain.usecase.GetOrdersUseCase
 import com.exerovv.deadpixel.feature.orders.presentation.state.OrdersUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +16,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
-    private val getOrders: GetOrdersUseCase
+    private val getOrders: GetOrdersUseCase,
+    tokenManager: TokenManager
 ) : ViewModel() {
+
+    val isManager: Boolean = tokenManager.getUserRole() == UserRole.MANAGER
 
     private val _state = MutableStateFlow(OrdersUiState())
     val state: StateFlow<OrdersUiState> = _state.asStateFlow()

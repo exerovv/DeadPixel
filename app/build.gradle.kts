@@ -92,6 +92,7 @@ dependencies {
     implementation(project(":feature-notifications"))
     implementation(project(":feature-workplans"))
     implementation(project(":feature-reports"))
+    implementation(project(":feature-users"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

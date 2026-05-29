@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.CalendarToday
 import androidx.compose.material3.Button
@@ -24,6 +25,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -50,10 +52,27 @@ import com.exerovv.deadpixel.feature.orders.presentation.state.OrdersUiState
 fun OrdersScreen(
     modifier: Modifier = Modifier,
     onOrderClick: (Int) -> Unit = {},
+    onCreateOrder: () -> Unit = {},
     viewModel: OrdersViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    OrdersList(state = state, onRefresh = viewModel::load, onOrderClick = onOrderClick, modifier = modifier)
+    Box(modifier = modifier.fillMaxSize()) {
+        OrdersList(state = state, onRefresh = viewModel::load, onOrderClick = onOrderClick)
+        if (viewModel.isManager) {
+            FloatingActionButton(
+                onClick = onCreateOrder,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp),
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    Icons.Default.Add,
+                    contentDescription = stringResource(R.string.create_order_fab_desc)
+                )
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +86,7 @@ internal fun OrdersList(
     PullToRefreshBox(
         isRefreshing = state.isLoading && state.orders.isNotEmpty(),
         onRefresh = onRefresh,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {

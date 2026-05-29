@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             DeadPixelTheme {
                 val isLoggedIn = remember { tokenManager.getAccessToken() != null }
-                NavGraph(isLoggedIn = isLoggedIn)
+                NavGraph(isLoggedIn = isLoggedIn, tokenManager = tokenManager)
             }
         }
     }

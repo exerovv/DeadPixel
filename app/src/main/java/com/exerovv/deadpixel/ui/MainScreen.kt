@@ -7,9 +7,11 @@ import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.automirrored.outlined.List
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Assessment
+import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.WorkOutline
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -36,6 +38,7 @@ import com.exerovv.deadpixel.core.network.UserRole
 import com.exerovv.deadpixel.feature.orders.presentation.OrdersScreen
 import com.exerovv.deadpixel.feature.orders.presentation.mywork.MyWorkScreen
 import com.exerovv.deadpixel.feature.reports.presentation.list.ReportsScreen
+import com.exerovv.deadpixel.feature.users.presentation.UsersScreen
 
 private data class BottomTab(
     val labelRes: Int,
@@ -50,6 +53,7 @@ fun MainScreen(
     onNavigateToOrderDetail: (Int) -> Unit,
     onNavigateToReportDetail: (Int) -> Unit = {},
     onGenerateReport: () -> Unit = {},
+    onCreateOrder: () -> Unit = {},
     viewModel: MainViewModel = hiltViewModel()
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
@@ -57,6 +61,7 @@ fun MainScreen(
 
     val tabs = if (isManager) listOf(
         BottomTab(R.string.tab_orders, Icons.AutoMirrored.Outlined.List, Icons.AutoMirrored.Filled.List),
+        BottomTab(R.string.tab_employees, Icons.Outlined.Group, Icons.Default.Group),
         BottomTab(R.string.tab_reports, Icons.Outlined.Assessment, Icons.Default.Assessment),
         BottomTab(R.string.tab_profile, Icons.Outlined.AccountCircle, Icons.Default.AccountCircle)
     ) else listOf(
@@ -67,8 +72,9 @@ fun MainScreen(
 
     val topBarTitle = if (isManager) {
         when (selectedTab) {
-            1 -> stringResource(R.string.tab_reports)
-            2 -> stringResource(R.string.tab_profile)
+            1 -> stringResource(R.string.tab_employees)
+            2 -> stringResource(R.string.tab_reports)
+            3 -> stringResource(R.string.tab_profile)
             else -> stringResource(R.string.app_name)
         }
     } else {
@@ -126,14 +132,18 @@ fun MainScreen(
             when (selectedTab) {
                 0 -> OrdersScreen(
                     modifier = Modifier.fillMaxSize().padding(padding),
-                    onOrderClick = onNavigateToOrderDetail
+                    onOrderClick = onNavigateToOrderDetail,
+                    onCreateOrder = onCreateOrder
                 )
-                1 -> ReportsScreen(
+                1 -> UsersScreen(
+                    modifier = Modifier.fillMaxSize().padding(padding)
+                )
+                2 -> ReportsScreen(
                     modifier = Modifier.fillMaxSize().padding(padding),
                     onReportClick = onNavigateToReportDetail,
                     onGenerateReport = onGenerateReport
                 )
-                2 -> ProfileScreen(
+                3 -> ProfileScreen(
                     userId = viewModel.userId,
                     userRole = viewModel.userRole,
                     onLogout = { viewModel.logout(); onLogout() },

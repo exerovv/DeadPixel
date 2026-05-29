@@ -13,6 +13,10 @@ class AuthInterceptor @Inject constructor(
         val request = chain.request().newBuilder()
             .apply { token?.let { addHeader("Authorization", "Bearer $it") } }
             .build()
-        return chain.proceed(request)
+        val response = chain.proceed(request)
+        if (response.code == 401 && token != null) {
+            tokenManager.signalUnauthorized()
+        }
+        return response
     }
 }

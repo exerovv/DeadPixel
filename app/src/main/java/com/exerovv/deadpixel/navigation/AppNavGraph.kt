@@ -1,14 +1,17 @@
 package com.exerovv.deadpixel.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.exerovv.deadpixel.core.network.TokenManager
 import com.exerovv.deadpixel.feature.auth.presentation.login.LoginScreen
 import com.exerovv.deadpixel.feature.auth.presentation.register.RegisterScreen
 import com.exerovv.deadpixel.feature.diagnostics.presentation.DiagnosticsScreen
+import com.exerovv.deadpixel.feature.orders.presentation.create.CreateOrderScreen
 import com.exerovv.deadpixel.feature.orders.presentation.detail.OrderDetailScreen
 import com.exerovv.deadpixel.feature.reports.presentation.detail.ReportDetailScreen
 import com.exerovv.deadpixel.feature.reports.presentation.generate.GenerateReportScreen
@@ -32,11 +35,20 @@ sealed class Screen(val route: String) {
     data object WorkPlan : Screen("workplan/{orderId}") {
         fun createRoute(orderId: Int) = "workplan/$orderId"
     }
+    data object CreateOrder : Screen("create-order")
 }
 
 @Composable
-fun NavGraph(isLoggedIn: Boolean) {
+fun NavGraph(isLoggedIn: Boolean, tokenManager: TokenManager) {
     val navController = rememberNavController()
+
+    LaunchedEffect(Unit) {
+        tokenManager.unauthorizedEvents.collect {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -81,6 +93,9 @@ fun NavGraph(isLoggedIn: Boolean) {
                 },
                 onGenerateReport = {
                     navController.navigate(Screen.GenerateReport.route)
+                },
+                onCreateOrder = {
+                    navController.navigate(Screen.CreateOrder.route)
                 }
             )
         }
@@ -130,6 +145,16 @@ fun NavGraph(isLoggedIn: Boolean) {
         ) {
             WorkPlanScreen(
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = Screen.CreateOrder.route) {
+            CreateOrderScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onCreated = { orderId ->
+                    navController.navigate(Screen.OrderDetail.createRoute(orderId)) {
+                        popUpTo(Screen.CreateOrder.route) { inclusive = true }
+                    }
+                }
             )
         }
     }

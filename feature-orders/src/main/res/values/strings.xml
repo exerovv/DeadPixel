@@ -23,4 +23,23 @@
     <string name="action_view_diagnostics">Открыть</string>
     <string name="section_workplan">Рабочий план</string>
     <string name="action_view_workplan">Открыть</string>
+    <!-- Order actions -->
+    <string name="section_actions">Действия</string>
+    <string name="action_change_status">Изменить статус</string>
+    <string name="action_assign_master">Назначить мастера</string>
+    <string name="create_order_fab_desc">Создать заказ</string>
+    <!-- Dialogs -->
+    <string name="dialog_cancel">Отмена</string>
+    <string name="dialog_confirm">Применить</string>
+    <string name="dialog_update_status_title">Статус заказа</string>
+    <string name="dialog_update_status_note_hint">Примечание</string>
+    <string name="dialog_assign_master_title">Назначить мастера</string>
+    <string name="dialog_assign_master_hint">ID мастера</string>
+    <!-- Create order -->
+    <string name="create_order_title">Новый заказ</string>
+    <string name="create_order_field_description">Описание</string>
+    <string name="create_order_field_equipment_id">ID оборудования</string>
+    <string name="create_order_field_deadline">Дедлайн (ГГГГ-ММ-ДД)</string>
+    <string name="create_order_field_cost">Стоимость (₽)</string>
+    <string name="create_order_submit">Создать</string>
 </resources>

@@ -1,12 +1,15 @@
 package com.exerovv.deadpixel.core.network
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.content.edit
 
 @Singleton
 class TokenManager @Inject constructor(
@@ -21,6 +24,14 @@ class TokenManager @Inject constructor(
         EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
+
+    private val _unauthorizedEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val unauthorizedEvents: SharedFlow<Unit> = _unauthorizedEvents.asSharedFlow()
+
+    fun signalUnauthorized() {
+        clearTokens()
+        _unauthorizedEvents.tryEmit(Unit)
+    }
 
     fun getAccessToken(): String? = prefs.getString("access_token", null)
     fun getRefreshToken(): String? = prefs.getString("refresh_token", null)

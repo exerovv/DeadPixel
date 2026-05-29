@@ -1,6 +1,7 @@
 package com.exerovv.deadpixel.feature.orders.presentation.detail
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -29,13 +31,20 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +55,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.exerovv.deadpixel.feature.orders.R
 import com.exerovv.deadpixel.feature.orders.domain.model.Order
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderAssignment
+import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatus
 import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatusHistory
 import com.exerovv.deadpixel.feature.orders.presentation.StatusChip
 import com.exerovv.deadpixel.feature.orders.presentation.label
@@ -110,14 +120,44 @@ fun OrderDetailScreen(
                     }
                 }
 
-                is OrderDetailUiState.Success -> OrderDetailContent(
-                    order = s.order,
-                    assignment = s.assignment,
-                    history = s.history,
-                    onNavigateToDiagnostics = { onNavigateToDiagnostics(s.order.id) },
-                    onNavigateToWorkPlan = { onNavigateToWorkPlan(s.order.id) },
-                    modifier = Modifier.fillMaxSize()
-                )
+                is OrderDetailUiState.Success -> {
+                    var showUpdateStatusDialog by remember { mutableStateOf(false) }
+                    var showAssignMasterDialog by remember { mutableStateOf(false) }
+
+                    OrderDetailContent(
+                        order = s.order,
+                        assignment = s.assignment,
+                        history = s.history,
+                        isManager = viewModel.isManager,
+                        isMaster = viewModel.isMaster,
+                        onNavigateToDiagnostics = { onNavigateToDiagnostics(s.order.id) },
+                        onNavigateToWorkPlan = { onNavigateToWorkPlan(s.order.id) },
+                        onShowUpdateStatus = { showUpdateStatusDialog = true },
+                        onShowAssignMaster = { showAssignMasterDialog = true },
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    if (showUpdateStatusDialog) {
+                        UpdateStatusDialog(
+                            currentStatus = s.order.status,
+                            onDismiss = { showUpdateStatusDialog = false },
+                            onConfirm = { status, note ->
+                                viewModel.processCommand(OrderDetailCommand.UpdateStatus(status, note))
+                                showUpdateStatusDialog = false
+                            }
+                        )
+                    }
+
+                    if (showAssignMasterDialog) {
+                        AssignMasterDialog(
+                            onDismiss = { showAssignMasterDialog = false },
+                            onConfirm = { masterId ->
+                                viewModel.processCommand(OrderDetailCommand.AssignMaster(masterId))
+                                showAssignMasterDialog = false
+                            }
+                        )
+                    }
+                }
             }
         }
     }
@@ -128,8 +168,12 @@ private fun OrderDetailContent(
     order: Order,
     assignment: OrderAssignment?,
     history: List<OrderStatusHistory>,
+    isManager: Boolean,
+    isMaster: Boolean,
     onNavigateToDiagnostics: () -> Unit,
     onNavigateToWorkPlan: () -> Unit,
+    onShowUpdateStatus: () -> Unit,
+    onShowAssignMaster: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -147,6 +191,16 @@ private fun OrderDetailContent(
         }
         item { DiagnosticsSection(onNavigateToDiagnostics) }
         item { WorkPlanSection(onNavigateToWorkPlan) }
+        if (isManager || isMaster) {
+            item {
+                ActionsCard(
+                    isManager = isManager,
+                    isMaster = isMaster,
+                    onShowUpdateStatus = onShowUpdateStatus,
+                    onShowAssignMaster = onShowAssignMaster
+                )
+            }
+        }
         if (history.isNotEmpty()) {
             item {
                 SectionLabel(stringResource(R.string.section_history))
@@ -272,6 +326,128 @@ private fun WorkPlanSection(onNavigate: () -> Unit) {
             }
         }
     }
+}
+
+@Composable
+private fun ActionsCard(
+    isManager: Boolean,
+    isMaster: Boolean,
+    onShowUpdateStatus: () -> Unit,
+    onShowAssignMaster: () -> Unit
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            SectionLabel(stringResource(R.string.section_actions))
+            if (isMaster) {
+                OutlinedButton(
+                    onClick = onShowUpdateStatus,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.action_change_status))
+                }
+            }
+            if (isManager) {
+                OutlinedButton(
+                    onClick = onShowAssignMaster,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.action_assign_master))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun UpdateStatusDialog(
+    currentStatus: OrderStatus,
+    onDismiss: () -> Unit,
+    onConfirm: (OrderStatus, String?) -> Unit
+) {
+    var selected by remember { mutableStateOf(currentStatus) }
+    var note by remember { mutableStateOf("") }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.dialog_update_status_title)) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                OrderStatus.entries.forEach { status ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { selected = status }
+                    ) {
+                        RadioButton(selected = selected == status, onClick = { selected = status })
+                        Text(text = status.label(), style = MaterialTheme.typography.bodyMedium)
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = note,
+                    onValueChange = { note = it },
+                    label = { Text(stringResource(R.string.dialog_update_status_note_hint)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(selected, note.takeIf { it.isNotBlank() }) }) {
+                Text(stringResource(R.string.dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.dialog_cancel))
+            }
+        }
+    )
+}
+
+@Composable
+private fun AssignMasterDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (Int) -> Unit
+) {
+    var input by remember { mutableStateOf("") }
+    val isValid = input.toIntOrNull() != null
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.dialog_assign_master_title)) },
+        text = {
+            OutlinedTextField(
+                value = input,
+                onValueChange = { input = it },
+                label = { Text(stringResource(R.string.dialog_assign_master_hint)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                isError = input.isNotEmpty() && !isValid
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = { input.toIntOrNull()?.let { onConfirm(it) } },
+                enabled = isValid
+            ) {
+                Text(stringResource(R.string.dialog_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.dialog_cancel))
+            }
+        }
+    )
 }
 
 @Composable
