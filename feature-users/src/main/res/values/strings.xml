@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common actions -->
+    <string name="action_retry">Повторить</string>
+    <string name="action_back">Назад</string>
+    <string name="dialog_cancel">Отмена</string>
+
+    <!-- Users list -->
+    <string name="users_empty">Сотрудники не найдены</string>
+    <string name="users_chip_manager">МН</string>
+    <string name="users_chip_master">МС</string>
+    <string name="users_chip_inactive">Неактивен</string>
+
+    <!-- User detail -->
+    <string name="user_detail_title_fallback">Сотрудник</string>
+    <string name="user_action_edit">Редактировать</string>
+    <string name="user_section_info">Информация</string>
+    <string name="user_field_id">ID</string>
+    <string name="user_field_email">Email</string>
+    <string name="user_field_registered">Зарегистрирован</string>
+    <string name="user_section_status">Статус аккаунта</string>
+    <string name="user_status_active">Активен</string>
+    <string name="user_status_inactive">Неактивен</string>
+    <string name="user_action_deactivate">Деактивировать</string>
+    <string name="user_action_activate">Активировать</string>
+
+    <!-- Edit user dialog -->
+    <string name="user_dialog_edit_title">Редактировать сотрудника</string>
+    <string name="user_field_name">Имя</string>
+    <string name="user_field_role">Роль</string>
+    <string name="user_role_master">Мастер</string>
+    <string name="user_role_manager">Менеджер</string>
+    <string name="user_action_save">Сохранить</string>
+
+</resources>

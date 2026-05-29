@@ -10,6 +10,8 @@ import com.exerovv.deadpixel.feature.auth.presentation.login.LoginScreen
 import com.exerovv.deadpixel.feature.auth.presentation.register.RegisterScreen
 import com.exerovv.deadpixel.feature.diagnostics.presentation.DiagnosticsScreen
 import com.exerovv.deadpixel.feature.orders.presentation.detail.OrderDetailScreen
+import com.exerovv.deadpixel.feature.reports.presentation.detail.ReportDetailScreen
+import com.exerovv.deadpixel.feature.reports.presentation.generate.GenerateReportScreen
 import com.exerovv.deadpixel.ui.MainScreen
 
 sealed class Screen(val route: String) {
@@ -22,6 +24,10 @@ sealed class Screen(val route: String) {
     data object Diagnostics : Screen("diagnostics/{orderId}") {
         fun createRoute(orderId: Int) = "diagnostics/$orderId"
     }
+    data object ReportDetail : Screen("report-detail/{reportId}") {
+        fun createRoute(reportId: Int) = "report-detail/$reportId"
+    }
+    data object GenerateReport : Screen("generate-report")
 }
 
 @Composable
@@ -65,6 +71,12 @@ fun NavGraph(isLoggedIn: Boolean) {
                 },
                 onNavigateToOrderDetail = { orderId ->
                     navController.navigate(Screen.OrderDetail.createRoute(orderId))
+                },
+                onNavigateToReportDetail = { reportId ->
+                    navController.navigate(Screen.ReportDetail.createRoute(reportId))
+                },
+                onGenerateReport = {
+                    navController.navigate(Screen.GenerateReport.route)
                 }
             )
         }
@@ -85,6 +97,24 @@ fun NavGraph(isLoggedIn: Boolean) {
         ) {
             DiagnosticsScreen(
                 onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(
+            route = Screen.ReportDetail.route,
+            arguments = listOf(navArgument("reportId") { type = NavType.IntType })
+        ) {
+            ReportDetailScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+        composable(route = Screen.GenerateReport.route) {
+            GenerateReportScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onGenerated = { reportId ->
+                    navController.navigate(Screen.ReportDetail.createRoute(reportId)) {
+                        popUpTo(Screen.GenerateReport.route) { inclusive = true }
+                    }
+                }
             )
         }
     }
