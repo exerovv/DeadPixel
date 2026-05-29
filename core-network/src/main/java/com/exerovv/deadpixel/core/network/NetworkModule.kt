@@ -9,6 +9,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -24,6 +25,21 @@ object NetworkModule {
         coerceInputValues = true
         isLenient = true
     }
+
+    @Named("auth")
+    @Provides
+    @Singleton
+    fun provideAuthOkHttpClient(): OkHttpClient = OkHttpClient.Builder().build()
+
+    @Named("auth")
+    @Provides
+    @Singleton
+    fun provideAuthRetrofit(@Named("auth") client: OkHttpClient, json: Json): Retrofit =
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
 
     @Provides
     @Singleton
