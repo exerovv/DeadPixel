@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -51,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -142,6 +144,7 @@ fun OrderDetailScreen(
                         history = s.history,
                         isManager = viewModel.isManager,
                         isMaster = viewModel.isMaster,
+                        hasAssignment = s.assignment != null,
                         onNavigateToDiagnostics = { onNavigateToDiagnostics(s.order.id) },
                         onNavigateToWorkPlan = { onNavigateToWorkPlan(s.order.id) },
                         onShowUpdateStatus = { showUpdateStatusDialog = true },
@@ -193,6 +196,7 @@ private fun OrderDetailContent(
     history: List<OrderStatusHistory>,
     isManager: Boolean,
     isMaster: Boolean,
+    hasAssignment: Boolean,
     onNavigateToDiagnostics: () -> Unit,
     onNavigateToWorkPlan: () -> Unit,
     onShowUpdateStatus: () -> Unit,
@@ -219,6 +223,7 @@ private fun OrderDetailContent(
                 ActionsCard(
                     isManager = isManager,
                     isMaster = isMaster,
+                    hasAssignment = hasAssignment,
                     onShowUpdateStatus = onShowUpdateStatus,
                     onShowAssignMaster = onShowAssignMaster
                 )
@@ -355,6 +360,7 @@ private fun WorkPlanSection(onNavigate: () -> Unit) {
 private fun ActionsCard(
     isManager: Boolean,
     isMaster: Boolean,
+    hasAssignment: Boolean,
     onShowUpdateStatus: () -> Unit,
     onShowAssignMaster: () -> Unit
 ) {
@@ -377,11 +383,30 @@ private fun ActionsCard(
                 }
             }
             if (isManager) {
-                OutlinedButton(
-                    onClick = onShowAssignMaster,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(stringResource(R.string.action_assign_master))
+                if (hasAssignment) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color(0xFF4CAF50),
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.status_master_assigned),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF4CAF50)
+                        )
+                    }
+                } else {
+                    OutlinedButton(
+                        onClick = onShowAssignMaster,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(stringResource(R.string.action_assign_master))
+                    }
                 }
             }
         }

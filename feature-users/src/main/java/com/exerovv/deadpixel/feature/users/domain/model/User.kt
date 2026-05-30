@@ -8,5 +8,5 @@ data class User(
     val email: String,
     val role: UserRole,
     val isActive: Boolean,
-    val registeredAt: String
+    val registeredAt: String?
 )

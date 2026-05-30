@@ -12,6 +12,8 @@ class UsersRepositoryImpl @Inject constructor(
 
     override suspend fun getUsers(): List<User> = api.getUsers().map { it.toDomain() }
 
+    override suspend fun getUserById(userId: Int): User = api.getUserById(userId).toDomain()
+
     override suspend fun setUserActive(userId: Int, value: Boolean) {
         api.setUserActive(userId, value)
     }

@@ -11,14 +11,14 @@
     <string name="workplan_items_empty">Шагов пока нет</string>
     <string name="workplan_fab_add_desc">Добавить шаг</string>
 
-    <string name="workplan_status_pending">Ожидает</string>
-    <string name="workplan_status_in_progress">В работе</string>
+    <string name="workplan_status_draft">Черновик</string>
+    <string name="workplan_status_active">Активный</string>
     <string name="workplan_status_completed">Завершён</string>
     <string name="workplan_status_cancelled">Отменён</string>
 
-    <string name="workplan_item_status_todo">К выполнению</string>
+    <string name="workplan_item_status_pending">Ожидает</string>
     <string name="workplan_item_status_in_progress">В работе</string>
-    <string name="workplan_item_status_done">Выполнен</string>
+    <string name="workplan_item_status_completed">Выполнен</string>
     <string name="workplan_item_status_skipped">Пропущен</string>
 
     <string name="workplan_dialog_add_title">Новый шаг</string>

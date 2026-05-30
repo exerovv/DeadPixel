@@ -27,6 +27,7 @@
     <string name="section_actions">Действия</string>
     <string name="action_change_status">Изменить статус</string>
     <string name="action_assign_master">Назначить мастера</string>
+    <string name="status_master_assigned">Мастер назначен</string>
     <string name="create_order_fab_desc">Создать заказ</string>
     <!-- Dialogs -->
     <string name="dialog_cancel">Отмена</string>

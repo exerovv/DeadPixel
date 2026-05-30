@@ -9,16 +9,16 @@ import com.exerovv.deadpixel.feature.workplans.domain.model.WorkPlanStatus
 
 @Composable
 fun WorkPlanStatus.label(): String = when (this) {
-    WorkPlanStatus.PENDING -> stringResource(R.string.workplan_status_pending)
-    WorkPlanStatus.IN_PROGRESS -> stringResource(R.string.workplan_status_in_progress)
+    WorkPlanStatus.DRAFT -> stringResource(R.string.workplan_status_draft)
+    WorkPlanStatus.ACTIVE -> stringResource(R.string.workplan_status_active)
     WorkPlanStatus.COMPLETED -> stringResource(R.string.workplan_status_completed)
     WorkPlanStatus.CANCELLED -> stringResource(R.string.workplan_status_cancelled)
 }
 
 @Composable
 fun WorkPlanStatus.color(): Color = when (this) {
-    WorkPlanStatus.PENDING -> MaterialTheme.colorScheme.onSurfaceVariant
-    WorkPlanStatus.IN_PROGRESS -> MaterialTheme.colorScheme.primary
+    WorkPlanStatus.DRAFT -> MaterialTheme.colorScheme.onSurfaceVariant
+    WorkPlanStatus.ACTIVE -> MaterialTheme.colorScheme.primary
     WorkPlanStatus.COMPLETED -> Color(0xFF4CAF50)
     WorkPlanStatus.CANCELLED -> MaterialTheme.colorScheme.error
 }

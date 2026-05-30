@@ -4,5 +4,6 @@ import com.exerovv.deadpixel.feature.users.domain.model.User
 
 interface UsersRepository {
     suspend fun getUsers(): List<User>
+    suspend fun getUserById(userId: Int): User
     suspend fun setUserActive(userId: Int, value: Boolean)
 }

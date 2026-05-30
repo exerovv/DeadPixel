@@ -10,6 +10,9 @@ interface UsersApi {
     @GET("api/users")
     suspend fun getUsers(): List<UserDto>
 
+    @GET("api/users/{id}")
+    suspend fun getUserById(@Path("id") userId: Int): UserDto
+
     @PUT("api/users/{id}/active")
     suspend fun setUserActive(@Path("id") userId: Int, @Query("value") value: Boolean)
 }

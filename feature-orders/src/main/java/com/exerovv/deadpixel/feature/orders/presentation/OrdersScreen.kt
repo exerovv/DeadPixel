@@ -86,7 +86,7 @@ internal fun OrdersList(
     PullToRefreshBox(
         isRefreshing = state.isLoading && state.orders.isNotEmpty(),
         onRefresh = onRefresh,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {

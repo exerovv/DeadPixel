@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -58,6 +59,8 @@ fun MainScreen(
 ) {
     var selectedTab by rememberSaveable { mutableIntStateOf(0) }
     val isManager = viewModel.userRole == UserRole.MANAGER
+    val overdueOrders by viewModel.overdueOrders.collectAsState()
+    val isRefreshingOverdue by viewModel.isRefreshingOverdue.collectAsState()
 
     val tabs = if (isManager) listOf(
         BottomTab(R.string.tab_orders, Icons.AutoMirrored.Outlined.List, Icons.AutoMirrored.Filled.List),
@@ -146,6 +149,9 @@ fun MainScreen(
                 3 -> ProfileScreen(
                     userId = viewModel.userId,
                     userRole = viewModel.userRole,
+                    overdueOrders = overdueOrders,
+                    isRefreshingOverdue = isRefreshingOverdue,
+                    onRefreshOverdueOrders = viewModel::refreshOverdueOrders,
                     onLogout = { viewModel.logout(); onLogout() },
                     modifier = Modifier.fillMaxSize().padding(padding)
                 )
@@ -163,6 +169,9 @@ fun MainScreen(
                 2 -> ProfileScreen(
                     userId = viewModel.userId,
                     userRole = viewModel.userRole,
+                    overdueOrders = emptyList(),
+                    isRefreshingOverdue = false,
+                    onRefreshOverdueOrders = null,
                     onLogout = { viewModel.logout(); onLogout() },
                     modifier = Modifier.fillMaxSize().padding(padding)
                 )

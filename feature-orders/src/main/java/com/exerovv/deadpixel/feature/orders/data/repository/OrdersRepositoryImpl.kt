@@ -20,6 +20,9 @@ class OrdersRepositoryImpl @Inject constructor(
     override suspend fun getOrders(): List<Order> =
         api.getOrders().map { it.toDomain() }
 
+    override suspend fun getOverdueOrders(): List<Order> =
+        api.getOverdueOrders().map { it.toDomain() }
+
     override suspend fun getOrderById(orderId: Int): Order =
         api.getOrderById(orderId).toDomain()
 

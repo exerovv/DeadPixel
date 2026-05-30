@@ -9,5 +9,5 @@ data class UserDto(
     val email: String,
     val role: String,
     val isActive: Boolean,
-    val registeredAt: String
+    val registeredAt: String? = null
 )

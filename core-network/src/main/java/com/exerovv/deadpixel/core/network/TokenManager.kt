@@ -52,7 +52,7 @@ class TokenManager @Inject constructor(
 
     fun getUserId(): Int? {
         val payload = decodePayload() ?: return null
-        return Regex(""""sub"\s*:\s*"?(\d+)"?""").find(payload)?.groupValues?.get(1)?.toIntOrNull()
+        return Regex(""""userId"\s*:\s*(\d+)""").find(payload)?.groupValues?.get(1)?.toIntOrNull()
     }
 
     fun getUserRole(): UserRole? {

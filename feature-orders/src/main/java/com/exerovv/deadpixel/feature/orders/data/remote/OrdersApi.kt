@@ -16,6 +16,9 @@ interface OrdersApi {
     @GET("api/orders")
     suspend fun getOrders(): List<OrderDto>
 
+    @GET("api/orders/overdue")
+    suspend fun getOverdueOrders(): List<OrderDto>
+
     @GET("api/orders/{id}")
     suspend fun getOrderById(@Path("id") orderId: Int): OrderDto
 

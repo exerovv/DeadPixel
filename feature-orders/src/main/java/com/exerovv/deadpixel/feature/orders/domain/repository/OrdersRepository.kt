@@ -7,6 +7,7 @@ import com.exerovv.deadpixel.feature.orders.domain.model.OrderStatusHistory
 
 interface OrdersRepository {
     suspend fun getOrders(): List<Order>
+    suspend fun getOverdueOrders(): List<Order>
     suspend fun getOrderById(orderId: Int): Order
     suspend fun getOrderAssignment(orderId: Int): OrderAssignment?
     suspend fun getOrderHistory(orderId: Int): List<OrderStatusHistory>
